@@ -18,13 +18,7 @@ console.log(redisUri)
 const client = redis.createClient({
     host: redisUri.hostname,
     port: Number(redisUri.port),
-    password: redisUri.auth.split(':')[1],
-    db: 0, 
-    tls: {
-        rejectUnauthorized: false,
-        requestCert: true,
-        agent: false
-    }
+    password: redisUri.auth.split(':')[1]
 })
 
 app.get('/', (req, res) => {
@@ -36,9 +30,28 @@ app.use(cors())
 
 app.use('/', (req, res, next) => {
     if(req.headers.token && req.headers.token !== '') {
-        res.header('Access-Control-Expose-Headers', 'TOKEN')
-        res.header('TOKEN', req.headers.token)
-        next()
+        client.hget('client', req.headers.token.toString(), (err, reply) => {
+            if(err) {
+                console.log(err)
+                res.status(400)
+            } else {
+                if(reply) {
+                    res.header('Access-Control-Expose-Headers', 'TOKEN')
+                    res.header('TOKEN', req.headers.token)
+                    next()
+                } else {
+                    crypto.randomBytes(64, (ex, buf) => {
+                        const token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
+                        req.headers.token = token
+                        res.header('TOKEN', token)
+                        res.header('Access-Control-Expose-Headers', 'TOKEN')
+                        client.hset('client', token, '[]')
+                        next()
+                    })
+                }
+            }
+        })
+        
     } else {
         console.log('----------------------------------------------')
         crypto.randomBytes(64, (ex, buf) => {
