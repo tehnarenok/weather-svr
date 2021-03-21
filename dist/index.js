@@ -9,10 +9,16 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const crypto_1 = __importDefault(require("crypto"));
 const redis_1 = __importDefault(require("redis"));
+const url_parse_1 = __importDefault(require("url-parse"));
 const app = express_1.default();
 const API_KEY = "436d1a96e5cb42e294ec78b059ab8e71";
 const API_URL = "https://api.weatherbit.io/v2.0/current?lang=ru&";
-const client = redis_1.default.createClient();
+const redisUri = url_parse_1.default(process.env.REDIS_URL || 'http://localhost:6379');
+console.log(redisUri);
+const client = redis_1.default.createClient({
+    host: redisUri.hostname,
+    port: Number(redisUri.port),
+});
 app.get('/', (req, res) => {
     res.send('Hello');
 });

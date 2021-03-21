@@ -4,19 +4,19 @@ import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import crypto from 'crypto'
 import redis from 'redis'
-import url from 'url'
+import url from 'url-parse'
 
 const app = express()
 
 const API_KEY : string = "436d1a96e5cb42e294ec78b059ab8e71"
 const API_URL : string = "https://api.weatherbit.io/v2.0/current?lang=ru&"
 
-let redis_uri = url.parse(process.env.REDIS_URL || 'http://127.0.0.1:6379')
-console.log(redis_uri)
+const redisUri = url(process.env.REDIS_URL || 'http://localhost:6379')
+console.log(redisUri)
 
 const client = redis.createClient({
-    host: redis_uri.host,
-    port: parseInt(redis_uri.port),
+    host: redisUri.hostname,
+    port: Number(redisUri.port),
 })
 
 app.get('/', (req, res) => {
