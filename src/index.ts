@@ -11,12 +11,19 @@ const app = express()
 const API_KEY : string = "436d1a96e5cb42e294ec78b059ab8e71"
 const API_URL : string = "https://api.weatherbit.io/v2.0/current?lang=ru&"
 
-const redisUri = url(process.env.REDIS_URL || 'http://localhost:6379')
+const redisUri = url(process.env.REDIS_URL || 'http://localhost:6378')
 console.log(redisUri)
 
 const client = redis.createClient({
     host: redisUri.hostname,
-    port: Number(redisUri.port),
+    port: Number(redisUri.port) + 1,
+    password: redisUri.auth.split(':')[2],
+    db: 0, 
+    tls: {
+        rejectUnauthorized: false,
+        requestCert: true,
+        agent: false
+    }
 })
 
 app.get('/', (req, res) => {
