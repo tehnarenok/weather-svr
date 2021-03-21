@@ -17,7 +17,7 @@ console.log(redisUri)
 const client = redis.createClient({
     host: redisUri.hostname,
     port: Number(redisUri.port) + 1,
-    password: redisUri.auth.split(':')[2],
+    password: redisUri.auth,
     db: 0, 
     tls: {
         rejectUnauthorized: false,
