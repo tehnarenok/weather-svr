@@ -4,13 +4,20 @@ import cookieParser from 'cookie-parser'
 import fetch from 'node-fetch'
 import crypto from 'crypto'
 import redis from 'redis'
+import url from 'url'
 
 const app = express()
 
 const API_KEY : string = "436d1a96e5cb42e294ec78b059ab8e71"
 const API_URL : string = "https://api.weatherbit.io/v2.0/current?lang=ru&"
 
-const client = redis.createClient()
+let redis_uri = url.parse(process.env.REDIS_URL || 'http://127.0.0.1:6379')
+console.log(redis_uri)
+
+const client = redis.createClient({
+    host: redis_uri.host,
+    port: parseInt(redis_uri.port),
+})
 
 app.get('/', (req, res) => {
     res.send('Hello')
@@ -27,7 +34,7 @@ app.use('/', (req, res, next) => {
     } else {
         console.log('----------------------------------------------')
         crypto.randomBytes(64, (ex, buf) => {
-            let token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
+            const token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
             req.headers.token = token
             res.header('TOKEN', token)
             res.header('Access-Control-Expose-Headers', 'TOKEN')
@@ -38,7 +45,7 @@ app.use('/', (req, res, next) => {
 })
 
 const parseApiRequest = (data) => {
-    let result = {
+    const result = {
         city: data.city_name,
         img: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
         params: [
@@ -54,7 +61,7 @@ const parseApiRequest = (data) => {
 }
 
 app.get('/favs/get', (req, res) => {
-    let token = req.headers.token?.toString()
+    const token = req.headers.token?.toString()
     client.hget('client', token, (err, reply) => {
         if(err) {
             console.log(err)
@@ -67,8 +74,8 @@ app.get('/favs/get', (req, res) => {
 })
 
 app.get('/favs/set', (req, res) => {
-    let cities = JSON.parse(req.query.cities?.toString() || '[]') 
-    let token = req.headers.token?.toString()
+    const cities = JSON.parse(req.query.cities?.toString() || '[]')
+    const token = req.headers.token?.toString()
 
     client.hset('client', token, JSON.stringify(cities), (err, reply) => {
         if(err) {
