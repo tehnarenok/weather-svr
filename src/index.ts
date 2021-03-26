@@ -101,16 +101,24 @@ app.get('/favs/set', (req, res) => {
     client.hset('client', token, JSON.stringify(cities), (err, reply) => {
         if(err) {
             console.log(err)
-            res.status(500)
+            res.status(500).end()
         } else {
-            res.status(200)
+            console.log('OK')
+            res.status(200).end()
         }
     })
 })
 
 app.get('/current/city', (request: Request, response: Response) => {
+    console.log(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
     fetch(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
-        .then(res => res.json())
+        .then(res => {
+            if(res.status == 204) {
+                response.status(404).end()
+                return
+            }
+            return res.json()
+        })
         .then(data => {
             if(data.error || data.count !== 1) {
                 response.status(404).end()
@@ -119,13 +127,20 @@ app.get('/current/city', (request: Request, response: Response) => {
             }
         })
         .catch(err => {
+            console.log(err)
             response.status(500).end()
         })
 })
 
 app.get('/current/coord', (request: Request, response: Response) => {
     fetch(`${API_URL}lat=${encodeURIComponent(request.query.lat.toString())}&lon=${encodeURIComponent(request.query.lon.toString())}&key=${API_KEY}`)
-        .then(res => res.json())
+        .then(res => {
+            if(res.status == 204) {
+                response.status(404).end()
+                return
+            }
+            return res.json()
+        })
         .then(data => {
             if(data.error || data.count !== 1) {
                 response.status(404).end()
