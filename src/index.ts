@@ -12,7 +12,7 @@ const API_KEY : string = "436d1a96e5cb42e294ec78b059ab8e71"
 const API_URL : string = "https://api.weatherbit.io/v2.0/current?lang=ru&"
 
 
-const redisUri = url(process.env.REDIS_URL || 'http://localhost:6378')
+const redisUri = url(process.env.REDIS_URL || 'redis://:@localhost:6379')
 console.log(redisUri)
 
 const client = redis.createClient({
@@ -113,7 +113,11 @@ app.get('/current/city', (request: Request, response: Response) => {
         .then(res => res.json())
         .then(data => {
             if(data.error || data.count !== 1) {
-                response.status(400).end()
+                if(data.count === 0) {
+                    response.status(404).end()
+                } else {
+                    response.status(400).end()
+                }
             } else {
                 response.json(parseApiRequest(data.data[0]))
             }
@@ -128,7 +132,11 @@ app.get('/current/coord', (request: Request, response: Response) => {
         .then(res => res.json())
         .then(data => {
             if(data.error || data.count !== 1) {
-                response.status(500).end()
+                if(data.count === 0) {
+                    response.status(404).end()
+                } else {
+                    response.status(400).end()
+                }
             } else {
                 response.json(parseApiRequest(data.data[0]))
             }
