@@ -113,11 +113,7 @@ app.get('/current/city', (request: Request, response: Response) => {
         .then(res => res.json())
         .then(data => {
             if(data.error || data.count !== 1) {
-                if(data.count === 0) {
-                    response.status(404).end()
-                } else {
-                    response.status(400).end()
-                }
+                response.status(404).end()
             } else {
                 response.json(parseApiRequest(data.data[0]))
             }
@@ -132,11 +128,7 @@ app.get('/current/coord', (request: Request, response: Response) => {
         .then(res => res.json())
         .then(data => {
             if(data.error || data.count !== 1) {
-                if(data.count === 0) {
-                    response.status(404).end()
-                } else {
-                    response.status(400).end()
-                }
+                response.status(404).end()
             } else {
                 response.json(parseApiRequest(data.data[0]))
             }
