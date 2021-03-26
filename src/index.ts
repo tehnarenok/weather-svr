@@ -113,7 +113,7 @@ app.get('/current/city', (request: Request, response: Response) => {
     console.log(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
     fetch(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
         .then(res => {
-            if(res.status == 204) {
+            if(res.status === 204) {
                 response.status(404).end()
                 return
             }
@@ -135,7 +135,7 @@ app.get('/current/city', (request: Request, response: Response) => {
 app.get('/current/coord', (request: Request, response: Response) => {
     fetch(`${API_URL}lat=${encodeURIComponent(request.query.lat.toString())}&lon=${encodeURIComponent(request.query.lon.toString())}&key=${API_KEY}`)
         .then(res => {
-            if(res.status == 204) {
+            if(res.status === 204) {
                 response.status(404).end()
                 return
             }
