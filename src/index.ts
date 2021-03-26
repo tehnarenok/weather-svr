@@ -86,7 +86,7 @@ app.get('/favs/get', (req, res) => {
     client.hget('client', token, (err, reply) => {
         if(err) {
             console.log(err)
-            res.status(400).end()
+            res.status(500).end()
             return
         }
 
@@ -101,7 +101,7 @@ app.get('/favs/set', (req, res) => {
     client.hset('client', token, JSON.stringify(cities), (err, reply) => {
         if(err) {
             console.log(err)
-            res.status(400)
+            res.status(500)
         } else {
             res.status(200)
         }
@@ -119,7 +119,7 @@ app.get('/current/city', (request: Request, response: Response) => {
             }
         })
         .catch(err => {
-            response.status(400).end()
+            response.status(500).end()
         })
 })
 
@@ -135,7 +135,7 @@ app.get('/current/coord', (request: Request, response: Response) => {
         })
         .catch(err => {
             console.log(err)
-            response.status(400).end()
+            response.status(500).end()
         })
 })
 
