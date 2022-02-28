@@ -8,12 +8,11 @@ import url from 'url-parse'
 
 const app = express()
 
-const API_KEY : string = "436d1a96e5cb42e294ec78b059ab8e71"
-const API_URL : string = "https://api.weatherbit.io/v2.0/current?lang=ru&"
+const API_KEY : string = process.env.API_KEY
+const API_URL : string = process.env.API_URL
 
 
 const redisUri = url(process.env.REDIS_URL || 'redis://:@localhost:6379')
-console.log(redisUri)
 
 const client = redis.createClient({
     host: redisUri.hostname,
@@ -53,7 +52,6 @@ app.use('/', (req, res, next) => {
         })
         
     } else {
-        console.log('----------------------------------------------')
         crypto.randomBytes(64, (ex, buf) => {
             const token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
             req.headers.token = token
