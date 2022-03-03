@@ -13,8 +13,6 @@ services:
       - local-network
     depends_on: 
       - redis
-    ports:
-      - 8080:8000
     restart: always
   redis:
     image: redis:alpine
@@ -24,8 +22,6 @@ services:
       - local-network
   frontend:
     image: tehnarenok/weather-frontend:latest
-    ports:
-      - 3000:80
     networks:
       - local-network
     restart: always
