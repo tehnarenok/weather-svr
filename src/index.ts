@@ -12,22 +12,19 @@ const API_KEY : string = process.env.API_KEY
 const API_URL : string = process.env.API_URL
 
 
-const redisUri = url(process.env.REDIS_URL || 'redis://:@localhost:6379')
-
 const client = redis.createClient({
-    host: redisUri.hostname,
-    port: Number(redisUri.port),
-    password: redisUri.auth.split(':')[1]
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT , 10),
 })
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     res.send('Hello')
 })
 
 app.use(cookieParser())
 app.use(cors())
 
-app.use('/', (req, res, next) => {
+app.use('/api/', (req, res, next) => {
     if(req.headers.token && req.headers.token !== '') {
         client.hget('client', req.headers.token.toString(), (err, reply) => {
             if(err) {
@@ -79,7 +76,7 @@ const parseApiRequest = (data) => {
     return result
 }
 
-app.get('/favs/get', (req, res) => {
+app.get('/api/favs/get', (req, res) => {
     const token = req.headers.token?.toString()
     client.hget('client', token, (err, reply) => {
         if(err) {
@@ -92,7 +89,7 @@ app.get('/favs/get', (req, res) => {
     })
 })
 
-app.get('/favs/set', (req, res) => {
+app.get('/api/favs/set', (req, res) => {
     const cities = JSON.parse(req.query.cities?.toString() || '[]')
     const token = req.headers.token?.toString()
 
@@ -107,7 +104,7 @@ app.get('/favs/set', (req, res) => {
     })
 })
 
-app.get('/current/city', (request: Request, response: Response) => {
+app.get('/api/current/city', (request: Request, response: Response) => {
     console.log(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
     fetch(`${API_URL}city=${encodeURIComponent(request.query.city.toString())}&key=${API_KEY}`)
         .then(res => {
@@ -130,7 +127,7 @@ app.get('/current/city', (request: Request, response: Response) => {
         })
 })
 
-app.get('/current/coord', (request: Request, response: Response) => {
+app.get('/api/current/coord', (request: Request, response: Response) => {
     fetch(`${API_URL}lat=${encodeURIComponent(request.query.lat.toString())}&lon=${encodeURIComponent(request.query.lon.toString())}&key=${API_KEY}`)
         .then(res => {
             if(res.status === 204) {
@@ -152,6 +149,6 @@ app.get('/current/coord', (request: Request, response: Response) => {
         })
 })
 
-app.listen(process.env.PORT || 8000, () => {
+app.listen(8000, () => {
     console.log('listen')
 })
